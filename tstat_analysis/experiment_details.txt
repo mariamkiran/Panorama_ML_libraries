@@ -1,0 +1,10 @@
+#experiment_details
+
+exp1: normal
+exp2: 1% packet loss
+exp3: 2% packet loss
+exp4: 1% packet duplicate 
+exp5: 5% packet duplicate
+exp6: 25% 50% reordering
+exp7: 25% 50% reordering
+exp8 folder to the same location, which has 3% packet loss. 5% packet loss gives me pretty low throughput <20 Mbps, I hope 3% loss is fine.
