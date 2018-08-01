@@ -1,7 +1,7 @@
 #experiment_details
 
 exp1: normal
-exp2: 1% packet loss
+exp2: 1% packet loss (ignored an older folder)
 exp3: 2% packet loss
 exp4: 1% packet duplicate 
 exp5: 5% packet duplicate
