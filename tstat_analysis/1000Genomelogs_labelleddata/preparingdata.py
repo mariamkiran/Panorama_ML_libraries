@@ -5,8 +5,8 @@ import sys
 import string
 #from fileread import *
 
-filetoread= 'log_tcp_complete_exp1.txt'
-filetowrite= 'tcp_exp1.csv'
+filetoread= 'log_tcp_complete_exp8.txt'
+filetowrite= 'tcp_exp8.csv'
 with open(filetoread) as f:
 	tcpData=f.read().replace(' ', ',')
 
