@@ -14,7 +14,7 @@ plotly.__version__
 from plotly.graph_objs import Bar, Scatter, Data, YAxis, Layout, Figure
 
 
-label_file = os.path.join("../rawdata/new_experiments_George/exp1pegasus_full_filtered.csv")
+label_file = os.path.join("exp1pegasus_full_filtered.csv")
 #fullfeaturedata-windows.csv")
 
 #raw_data={'Average rtt C2S', 'Average rtt S2C','target'}
