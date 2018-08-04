@@ -8,3 +8,15 @@ exp5: 5% packet duplicate
 exp6: 25% 50% reordering
 exp7: 25% 50% reordering
 exp8 folder to the same location, which has 3% packet loss. 5% packet loss gives me pretty low throughput <20 Mbps, I hope 3% loss is fine.
+
+
+control experiments:
+
+Exp 1: Random Traffic
+Exp 2: No Flow
+Exp 3: Loss 1%
+Exp 4: Loss 5%
+Exp 5: Packet Duplication 1%
+Exp 6: Packet Duplication 5%
+Exp 7: Packet Reorder 25%-50%
+Exp 8: Packet Reorder 50%-50%
