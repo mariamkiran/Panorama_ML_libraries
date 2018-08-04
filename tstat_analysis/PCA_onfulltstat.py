@@ -2,6 +2,7 @@
 
 
 from sklearn import cluster, datasets
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd 
@@ -23,14 +24,14 @@ df=pd.read_csv(label_file)
 
 # load dataset into Pandas DataFrame
 df = pd.read_csv(label_file, names=['Average rtt C2S','rtt min',
-	'rtt max','max seg size','min seg size','win max','win min','win zero','cwin max',
-	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','Target'])
-
+	'rtt max','max seg size','min seg size','win max','win min','cwin max',
+	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','target'])
 print "*******"
-print df
+#print df
 
 #extracting features
-features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size','win max','win min','win zero','cwin max',
+features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size',
+'win max','win min','cwin max',
 	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO']
 
 
@@ -38,33 +39,40 @@ features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size',
 # Separating out the features
 x = df.loc[:, features].values
 # Separating out the target
-y = df.loc[:,['Target']].values
+y = df.loc[:,['target']].values
+print y
 # Standardizing the features
 x = StandardScaler().fit_transform(x)
 
 print "1"
 
-pca = PCA(n_components=2)
+pca = PCA(n_components=3)
 principalComponents = pca.fit_transform(x)
 principalDf = pd.DataFrame(data = principalComponents
-             , columns = ['principal component 1', 'principal component 2'])
+             , columns = ['principal component 1', 'principal component 2','principal component 3'])
 
-finalDf = pd.concat([principalDf, df[['Target']]], axis = 1)
+finalDf = pd.concat([principalDf, df[['target']]], axis = 1)
 
 #plot PCA
 
 fig = plt.figure(figsize = (8,8))
-ax = fig.add_subplot(1,1,1) 
+#ax = fig.add_subplot(1,1,1) 
+ax = fig.add_subplot(111, projection='3d')
+
 ax.set_xlabel('Principal Component 1', fontsize = 10)
 ax.set_ylabel('Principal Component 2', fontsize = 10)
-ax.set_title('2 component PCA', fontsize = 15)
-targets = ['Random', 'NoFlow', 'Loss1%', 'Loss5%', 'pDup1%', 'pDup5%','ReorderFirst','ReorderingSecond']
+ax.set_zlabel('Principal Component 3', fontsize = 10)
+
+ax.set_title('3 component PCA', fontsize = 15)
+targets = ['Random', 'Noflow', 'loss1%', 'loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
+
 
 colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
 for target, color in zip(targets,colors):
-	indicesToKeep = finalDf['Target'] == target
+	indicesToKeep = finalDf['target'] == target
 	ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
   	, finalDf.loc[indicesToKeep, 'principal component 2']
+  	, finalDf.loc[indicesToKeep, 'principal component 3']
   	, c = color
   	, s = 50)
 ax.legend(targets)
