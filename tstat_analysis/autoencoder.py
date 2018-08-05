@@ -105,6 +105,32 @@ decoder_layer = autoencoder.layers[-1]
 decoder = Model(encoded_input, decoder_layer(encoded_input))
 encoded_data = encoder.predict(x)
 
-plot3clusters(encoded_data[:,:2], 'Linear AE', 'AE')  
+#plt.scatter(encoded_data[:,:2], 'Linear AE', 'AE')  
+print(encoded_data[:,:2])
+print("$$$")
+print(encoded_data)
+print("$$$")
+print(encoded_data[0])
+print("$$$")
+print(encoded_data[1])
+
+fig = plt.figure(figsize = (8,8))
+ax = fig.add_subplot(1,1,1) 
+#ax = fig.add_subplot(111, projection='3d')
+
+ax.set_xlabel('AE 1', fontsize = 10)
+ax.set_ylabel('AE 2', fontsize = 10)
+#ax.set_zlabel('Principal Component 3', fontsize = 10)
+
+ax.set_title('Linear AE', fontsize = 15)
+targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
 
 
+colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
+for target, color in zip(targets,colors):
+	ax.scatter(encoded_data[:,:2]
+  	, c = color
+  	, s = 50)
+ax.legend(targets)
+ax.grid()
+plt.show()
