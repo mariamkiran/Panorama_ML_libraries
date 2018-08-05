@@ -46,25 +46,25 @@ x = StandardScaler().fit_transform(x)
 
 print "1"
 
-pca = PCA(n_components=3)
+pca = PCA(n_components=2)
 principalComponents = pca.fit_transform(x)
 principalDf = pd.DataFrame(data = principalComponents
-             , columns = ['principal component 1', 'principal component 2','principal component 3'])
+             , columns = ['principal component 1', 'principal component 2'])
 
 finalDf = pd.concat([principalDf, df[['target']]], axis = 1)
 
 #plot PCA
 
 fig = plt.figure(figsize = (8,8))
-#ax = fig.add_subplot(1,1,1) 
-ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(1,1,1) 
+#ax = fig.add_subplot(111, projection='3d')
 
 ax.set_xlabel('Principal Component 1', fontsize = 10)
 ax.set_ylabel('Principal Component 2', fontsize = 10)
-ax.set_zlabel('Principal Component 3', fontsize = 10)
+#ax.set_zlabel('Principal Component 3', fontsize = 10)
 
-ax.set_title('3 component PCA', fontsize = 15)
-targets = ['Random', 'Noflow', 'loss1%', 'loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
+ax.set_title('2 component PCA', fontsize = 15)
+targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
 
 
 colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
@@ -72,7 +72,6 @@ for target, color in zip(targets,colors):
 	indicesToKeep = finalDf['target'] == target
 	ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
   	, finalDf.loc[indicesToKeep, 'principal component 2']
-  	, finalDf.loc[indicesToKeep, 'principal component 3']
   	, c = color
   	, s = 50)
 ax.legend(targets)
