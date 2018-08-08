@@ -26,7 +26,7 @@ df=pd.read_csv(label_file)
 df = pd.read_csv(label_file, names=['Average rtt C2S','rtt min',
 	'rtt max','max seg size','min seg size','win max','win min','cwin max',
 	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','target'])
-print "*******"
+print("*******")
 #print df
 
 #extracting features
@@ -40,11 +40,11 @@ features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size',
 x = df.loc[:, features].values
 # Separating out the target
 y = df.loc[:,['target']].values
-print y
+print(y)
 # Standardizing the features
 x = StandardScaler().fit_transform(x)
 
-print "1"
+
 
 pca = PCA(n_components=2)
 principalComponents = pca.fit_transform(x)
@@ -78,28 +78,28 @@ ax.legend(targets)
 ax.grid()
 plt.show()
 
-print "explained_variance_"
+print("explained_variance_")
 print(pca.explained_variance_)  
-print "singular values"
+print("singular values")
 print(pca.singular_values_) 
 
-print "variance ratio"
+print("variance ratio")
 print(pca.explained_variance_ratio_)
 
-print "mean"
+print("mean")
 print(pca.mean_)
 
 
 
-print "PCA has been conducted, with 2 component as a parameter and we fit the data"
+#print "PCA has been conducted, with 2 component as a parameter and we fit the data"
 
-print "now view the new features, number of rows and 2 features" 
+#print "now view the new features, number of rows and 2 features" 
 print(principalComponents.shape)
 
-print "new feature data"
+#print "new feature data"
 print(principalComponents)
 
-print "columns"
+#print "columns"
 intermediary=pd.DataFrame(pca.components_, columns=list(features)).values
 print(intermediary.reshape(2,26).tolist())
 
@@ -135,7 +135,7 @@ x -= np.mean(x, axis=0)
 cov_matrix = np.dot(x.T, x) / n_samples
 for eigenvector in pca.components_:
     print(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
-print "end"
+
 
 
 

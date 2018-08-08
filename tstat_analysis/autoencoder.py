@@ -33,10 +33,29 @@ from hyperas.distributions import choice, uniform, conditional
 from keras.layers import Input
 
 #----
-label_file = os.path.join("controldata/cleanDataPCATest.csv")
+
+
+
+def plot3clusters(X, title, vtitle):
+  plt.figure()
+  #colors = ['navy', 'turquoise', 'darkorange']
+  targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
+  colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
+  lw = 2
+
+  for color, i, target in zip(colors,[0,1,2,3,4,5,6,7], targets):
+  	plt.scatter(X[y == i, 0], X[y == i, 1], color=color, alpha=1., lw=lw, label=target)
+  
+  plt.legend(loc='best', shadow=False, scatterpoints=1)
+  plt.title(title)  
+  plt.xlabel(vtitle + "1")
+  plt.ylabel(vtitle + "2")
+  plt.show()
+
 
 #raw_data={'Average rtt C2S', 'Average rtt S2C','target'}
 #df=pd.DataFrame(raw_data, columns = ['Sent','Received','Lost','Duplicated','Reordered'])
+label_file = os.path.join("controldata/cleanDataPCATest.csv")
 
 df=pd.read_csv(label_file)
 
@@ -105,7 +124,8 @@ decoder_layer = autoencoder.layers[-1]
 decoder = Model(encoded_input, decoder_layer(encoded_input))
 encoded_data = encoder.predict(x)
 
-#plt.scatter(encoded_data[:,:2], 'Linear AE', 'AE')  
+plot3clusters(encoded_data[:,:2], 'Linear AE', 'AE')  
+
 print(encoded_data[:,:2])
 print("$$$")
 print(encoded_data)
