@@ -1,57 +1,18 @@
 #autoencoder.py
 
-from __future__ import print_function
-
-from sklearn import cluster, datasets
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd 
-import os
-
-import tensorflow
-
-from sklearn.preprocessing import StandardScaler
-
-from sklearn.decomposition import PCA, IncrementalPCA
-
-
-
-#----
+from pandas import read_csv, DataFrame
+from numpy.random import seed
+from sklearn.preprocessing import minmax_scale
+from sklearn.model_selection import train_test_split
 from keras.layers import Input, Dense
 from keras.models import Model
+import os
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
-
-
-from hyperopt import Trials, STATUS_OK, tpe
-from keras.datasets import mnist
-from keras.layers.core import Dense, Dropout, Activation
-from keras.models import Sequential
-from keras.utils import np_utils
-
-from hyperas import optim
-from hyperas.distributions import choice, uniform, conditional
-from keras.layers import Input
 
 #----
 
-
-
-def plot3clusters(X, title, vtitle):
-  plt.figure()
-  #colors = ['navy', 'turquoise', 'darkorange']
-  targets = ['Normal', 'Loss1%','Loss5%', 'pDup1%', 'pDup5%','reord25-50%','reord50-50%', 'Loss3%']
-  colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
-  lw = 2
-
-  for color, i, target in zip(colors,[0,1,2,3,4,5,6,7], targets):
-  	plt.scatter(X[y == i, 0], X[y == i, 1], color=color, alpha=1., lw=lw, label=target)
-  
-  plt.legend(loc='best', shadow=False, scatterpoints=1)
-  plt.title(title)  
-  plt.xlabel(vtitle + "1")
-  plt.ylabel(vtitle + "2")
-  plt.show()
 
 
 #raw_data={'Average rtt C2S', 'Average rtt S2C','target'}
@@ -95,40 +56,42 @@ targets = ['Normal', 'Loss1%','Loss5%', 'pDup1%', 'pDup5%','reord25-50%','reord5
 colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
 
 
-#create an AE and fit it with our data using 3 neurons in the dense layer using keras' functional API
-input_dim =x.shape[1]
-encoding_dim = 2  
-input_img = Input(shape=(input_dim,))
-encoded = Dense(encoding_dim, activation='linear')(input_img)
-decoded = Dense(input_dim, activation='linear')(encoded)
-autoencoder = Model(input_img, decoded)
-autoencoder.compile(optimizer='adam', loss='mse')
-print(autoencoder.summary())
+ 
+# SCALE EACH FEATURE INTO [0, 1] RANGE
+sX = minmax_scale(x, axis = 0)
+ncol = sX.shape[1]
+X_train, X_test, Y_train, Y_test = train_test_split(sX, y, train_size = 0.5, random_state = seed(2017))
+ 
+### AN EXAMPLE OF SIMPLE AUTOENCODER ###
+# InputLayer (None, 10)
+#      Dense (None, 5)
+#      Dense (None, 10)
+print("training")
+print(X_train)
 
-history = autoencoder.fit(x, x,
-                epochs=1000,
-                batch_size=16,
-                shuffle=True,
-                validation_split=0.1,
-                verbose = 0)
+print("test")
+print(X_test)
 
-print(history)
-#plot our loss 
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model train vs validation loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'validation'], loc='upper right')
-plt.show()
+input_dim = Input(shape = (ncol, ))
+# DEFINE THE DIMENSION OF ENCODER ASSUMED 3
+encoding_dim = 3
+# DEFINE THE ENCODER LAYER
+encoded = Dense(encoding_dim, activation = 'relu')(input_dim)
+# DEFINE THE DECODER LAYER
+decoded = Dense(ncol, activation = 'sigmoid')(encoded)
+# COMBINE ENCODER AND DECODER INTO AN AUTOENCODER MODEL
+autoencoder = Model(input = input_dim, output = decoded)
+# CONFIGURE AND TRAIN THE AUTOENCODER
+autoencoder.compile(optimizer = 'adadelta', loss = 'binary_crossentropy')
+autoencoder.fit(X_train, X_train, nb_epoch = 50, batch_size = 100, shuffle = True, validation_data = (X_test, X_test))
 
-# use our encoded layer to encode the training input
-# encoder = Model(input_img, encoded)
-# encoded_input = Input(shape=(encoding_dim,))
-# decoder_layer = autoencoder.layers[-1]
-# decoder = Model(encoded_input, decoder_layer(encoded_input))
-# encoded_data = encoder.predict(x)
+# THE ENCODER TO EXTRACT THE REDUCED DIMENSION FROM THE ABOVE AUTOENCODER
+encoder = Model(inputs = input_dim, outputs = encoded)
+encoded_input = Input(shape = (encoding_dim, ))
+encoded_out = encoder.predict(X_test)
+encoded_out[0:2]
 
-# plot3clusters(encoded_data[:,:2], 'Linear AE', 'AE')  
+print(encoded_out)
+#array([[ 0.        ,  1.26510417,  1.62803197],
+#       [ 2.32508397,  0.99735016,  2.06461048]], dtype=float32)
 
-# plt.show()
