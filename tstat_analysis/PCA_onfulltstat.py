@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd 
 import os
+from sklearn import preprocessing
+
 
 
 from sklearn.preprocessing import StandardScaler
@@ -14,7 +16,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA, IncrementalPCA
 
 
-label_file = os.path.join("controldata/cleanDataPCATest.csv")
+label_file = os.path.join("controldata/cleanExp1_cleanfeatures.csv")
+#cleanDataPCATest.csv")
 
 #raw_data={'Average rtt C2S', 'Average rtt S2C','target'}
 #df=pd.DataFrame(raw_data, columns = ['Sent','Received','Lost','Duplicated','Reordered'])
@@ -23,16 +26,59 @@ df=pd.read_csv(label_file)
 
 
 # load dataset into Pandas DataFrame
-df = pd.read_csv(label_file, names=['Average rtt C2S','rtt min',
-	'rtt max','max seg size','min seg size','win max','win min','cwin max',
-	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','target'])
+#df = pd.read_csv(label_file, names=['Average rtt C2S','rtt min',
+#	'rtt max','max seg size','min seg size','win max','win min','cwin max',
+#	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','target'])
+
+df = pd.read_csv(label_file, names=['packets','RST sent','ACK sent','PURE ACK sent',
+'unique bytes','data pkts','data bytes','rexmit pkts','rexmit bytes',
+'out seq pkts','SYN count','FIN count','packets2','RST sent2','ACK sent2',
+'PURE ACK sent2','unique bytes2','data pkts2','data bytes2','rexmit pkts2','rexmit bytes2',
+'out seq pkts2','SYN count2','FIN count2',
+'Completion time','C first payload','S first payload','C last payload','S last payload',
+ 'C first ack','S first ack','C Internal','S Internal','C anonymized','S anonymized',
+ 'Connection type','P2P type','HTTP type','Average rtt C2S','rtt min','rtt max',
+ 'Stdev rtt','rtt count','ttl_min','ttl_max','Average rtt S2C','rtt min2','rtt max2','Stdev rtt2',
+ 'rtt count2','ttl_min2','ttl_max2','P2P subtype','ED2K Data',
+ 'ED2K Signaling','ED2K C2S','ED2K C2C','ED2K Chat','RFC1323 ws','RFC1323 ts',
+ 'window scale','SACK req','SACK sent','MSS','max seg size','min seg size',
+ 'win max','win min','win zero','cwin max','cwin min','initial cwin','rtx RTO',
+ 'rtx FR','reordering','net dup','unknown','flow control','unnece rtx RTO','unnece rtx FR',
+ 'SYN seqno','RFC1323 ws','RFC1323 ts','window scale',
+ 'SACK req','SACK sent','MSS2','max seg size2','min seg size2','win max2','win min2',
+ 'win zero2','cwin max2','cwin min2','initial cwin2','rtx RTO2','rtx FR2','reordering2',
+ 'net dup2','unknown2','flow control2','unnece rtx RTO2','unnece rtx FR2','SYN seqno2',
+ 'httpignore','httpignore2','httpignore3','httpignore4','httpignore5','httpignore6','httpignore7'
+ ,'httpignore8','target'])
+
+
+
+
 print("*******")
 #print df
 
 #extracting features
-features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size',
-'win max','win min','cwin max',
-	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO']
+features = ['packets','RST sent','ACK sent','PURE ACK sent',
+'unique bytes','data pkts','data bytes','rexmit pkts','rexmit bytes',
+'out seq pkts','SYN count','FIN count','packets2','RST sent2','ACK sent2',
+'PURE ACK sent2','unique bytes2','data pkts2','data bytes2','rexmit pkts2','rexmit bytes2',
+'out seq pkts2','SYN count2','FIN count2',
+'Completion time','C first payload','S first payload','C last payload','S last payload',
+ 'C first ack','S first ack','C Internal','S Internal','C anonymized','S anonymized',
+ 'Connection type','P2P type','HTTP type','Average rtt C2S','rtt min','rtt max',
+ 'Stdev rtt','rtt count','ttl_min','ttl_max','Average rtt S2C','rtt min2','rtt max2','Stdev rtt2',
+ 'rtt count2','ttl_min2','ttl_max2','P2P subtype','ED2K Data',
+ 'ED2K Signaling','ED2K C2S','ED2K C2C','ED2K Chat','RFC1323 ws','RFC1323 ts',
+ 'window scale','SACK req','SACK sent','MSS','max seg size','min seg size',
+ 'win max','win min','win zero','cwin max','cwin min','initial cwin','rtx RTO',
+ 'rtx FR','reordering','net dup','unknown','flow control','unnece rtx RTO','unnece rtx FR',
+ 'SYN seqno','RFC1323 ws','RFC1323 ts','window scale',
+ 'SACK req','SACK sent','MSS2','max seg size2','min seg size2','win max2','win min2',
+ 'win zero2','cwin max2','cwin min2','initial cwin2','rtx RTO2','rtx FR2','reordering2',
+ 'net dup2','unknown2','flow control2','unnece rtx RTO2','unnece rtx FR2','SYN seqno2',
+ 'httpignore','httpignore2','httpignore3','httpignore4','httpignore5','httpignore6','httpignore7'
+ ,'httpignore8']
+
 
 
 
@@ -45,35 +91,51 @@ print(y)
 x = StandardScaler().fit_transform(x)
 
 
+pd.set_option('display.max_columns', None)
 
-pca = PCA(n_components=2)
+newdf=pd.DataFrame(x,columns=features)
+data_scaled=pd.DataFrame(preprocessing.scale(newdf),columns=newdf.columns)
+pca=PCA(n_components=2)
+pca.fit_transform(data_scaled)
+print(pd.DataFrame(pca.components_,
+	columns=data_scaled.columns,
+	index = ['PC-1','PC-2']))
+
+
+print("###")
+
+pca = PCA(n_components=3)
 principalComponents = pca.fit_transform(x)
 principalDf = pd.DataFrame(data = principalComponents
-             , columns = ['principal component 1', 'principal component 2'])
+             , columns = ['principal component 1', 'principal component 2', 'principal component 3'])
 
 finalDf = pd.concat([principalDf, df[['target']]], axis = 1)
+
+#printing feature values
+
 
 #plot PCA
 
 fig = plt.figure(figsize = (8,8))
-ax = fig.add_subplot(1,1,1) 
-#ax = fig.add_subplot(111, projection='3d')
+#ax = fig.add_subplot(1,1,1) 
+ax = fig.add_subplot(111, projection='3d')
 
 ax.set_xlabel('Principal Component 1', fontsize = 10)
 ax.set_ylabel('Principal Component 2', fontsize = 10)
-#ax.set_zlabel('Principal Component 3', fontsize = 10)
+ax.set_zlabel('Principal Component 3', fontsize = 10)
 
-ax.set_title('2 component PCA', fontsize = 15)
-targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
+#ax.set_title('2 component PCA', fontsize = 15)
+targets = ['Normal', 'NoFlow','Loss1%','Loss5%', 'pDup1%', 'pDup5%','reord25-50%','reord50-50%']
 
 
 colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
 for target, color in zip(targets,colors):
 	indicesToKeep = finalDf['target'] == target
 	ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
-  	, finalDf.loc[indicesToKeep, 'principal component 2']
-  	, c = color
-  	, s = 50)
+		, finalDf.loc[indicesToKeep, 'principal component 2']
+		, finalDf.loc[indicesToKeep, 'principal component 3']
+		, c = color
+		, s = 50)
 ax.legend(targets)
 ax.grid()
 plt.show()

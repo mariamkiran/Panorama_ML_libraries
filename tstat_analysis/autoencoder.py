@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd 
 import os
 
+import tensorflow
 
 from sklearn.preprocessing import StandardScaler
 
@@ -39,7 +40,7 @@ from keras.layers import Input
 def plot3clusters(X, title, vtitle):
   plt.figure()
   #colors = ['navy', 'turquoise', 'darkorange']
-  targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
+  targets = ['Normal', 'Loss1%','Loss5%', 'pDup1%', 'pDup5%','reord25-50%','reord50-50%', 'Loss3%']
   colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
   lw = 2
 
@@ -55,24 +56,27 @@ def plot3clusters(X, title, vtitle):
 
 #raw_data={'Average rtt C2S', 'Average rtt S2C','target'}
 #df=pd.DataFrame(raw_data, columns = ['Sent','Received','Lost','Duplicated','Reordered'])
-label_file = os.path.join("controldata/cleanDataPCATest.csv")
+
+label_file = os.path.join("1000Genomelogs_labelleddata/fullfeature-26variables.csv")
 
 df=pd.read_csv(label_file)
 
 
 # load dataset into Pandas DataFrame
-df = pd.read_csv(label_file, names=['Average rtt C2S','rtt min',
-	'rtt max','max seg size','min seg size','win max','win min','cwin max',
-	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO','target'])
+df = pd.read_csv(label_file, names=['Average rtt C2S', 'Average rtt S2C',
+	'max seg size1','min seg size1','win max1','win min1','win zero1','cwin max1',
+	'cwin min1','initial cwin1','rtx RTO1','rtx FR1','reordering1','net dup1','max seg size',
+	'in seg size','win max','win min','win zero','cwin max','cwin min','initial cwin','rtx RTO','rtx FR',
+	'eordering','net dup','target'])
 
 print("*******")
 #print df
 
 #extracting features
-features = ['Average rtt C2S','rtt min','rtt max','max seg size','min seg size',
-'win max','win min','cwin max',
-	'cwin min','initial cwin','rtx RTO','rtx FR','reordering','unnece rtx RTO']
-
+features = ['Average rtt C2S', 'Average rtt S2C','max seg size1','min seg size1','win max1',
+'win min1','win zero1','cwin max1','cwin min1','initial cwin1','rtx RTO1','rtx FR1','reordering1','net dup1',
+'max seg size','in seg size','win max','win min','win zero','cwin max','cwin min','initial cwin','rtx RTO','rtx FR',
+'eordering','net dup']
 
 
 # Separating out the features
@@ -85,8 +89,8 @@ x = StandardScaler().fit_transform(x)
 
 print("1")
 
-targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
-
+targets = ['Normal', 'Loss1%','Loss5%', 'pDup1%', 'pDup5%','reord25-50%','reord50-50%', 'Loss3%']
+  
 
 colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
 
@@ -108,6 +112,7 @@ history = autoencoder.fit(x, x,
                 validation_split=0.1,
                 verbose = 0)
 
+print(history)
 #plot our loss 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
@@ -118,39 +123,12 @@ plt.legend(['train', 'validation'], loc='upper right')
 plt.show()
 
 # use our encoded layer to encode the training input
-encoder = Model(input_img, encoded)
-encoded_input = Input(shape=(encoding_dim,))
-decoder_layer = autoencoder.layers[-1]
-decoder = Model(encoded_input, decoder_layer(encoded_input))
-encoded_data = encoder.predict(x)
+# encoder = Model(input_img, encoded)
+# encoded_input = Input(shape=(encoding_dim,))
+# decoder_layer = autoencoder.layers[-1]
+# decoder = Model(encoded_input, decoder_layer(encoded_input))
+# encoded_data = encoder.predict(x)
 
-plot3clusters(encoded_data[:,:2], 'Linear AE', 'AE')  
+# plot3clusters(encoded_data[:,:2], 'Linear AE', 'AE')  
 
-print(encoded_data[:,:2])
-print("$$$")
-print(encoded_data)
-print("$$$")
-print(encoded_data[:,0])
-print("$$$")
-print(encoded_data[:,1])
-
-fig = plt.figure(figsize = (8,8))
-ax = fig.add_subplot(1,1,1) 
-#ax = fig.add_subplot(111, projection='3d')
-
-ax.set_xlabel('AE 1', fontsize = 10)
-ax.set_ylabel('AE 2', fontsize = 10)
-#ax.set_zlabel('Principal Component 3', fontsize = 10)
-
-ax.set_title('Linear AE', fontsize = 15)
-targets = ['Random', 'Noflow','loss1%','loss5%', 'pDup1%', 'pDup5%','Reord25-50%','Reord50-50%']
-
-
-colors = ['r', 'g', 'b', 'black', 'lime', 'yellow', 'cyan', 'coral']
-for target, color in zip(targets,colors):
-	ax.scatter(encoded_data[:,0],encoded_data[:,1] 
-  	, c = color
-  	, s = 50)
-ax.legend(targets)
-ax.grid()
-plt.show()
+# plt.show()

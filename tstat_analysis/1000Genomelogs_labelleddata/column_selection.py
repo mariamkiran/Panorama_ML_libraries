@@ -12,5 +12,4 @@ with open(inf, 'rb') as input_file:
     reader = csv.reader(input_file, delimiter=delimiter)
     with open(outf, 'wb') as output_file:
         writer = csv.writer(output_file, delimiter=delimiter)
-        writer.writerows(imap(itemgetter(45, 46,47, 71, 72, 73, 74, 76, 77, 78, 79, 80, 81, 85), reader))
-        
+        writer.writerows(imap(itemgetter(45, 52, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105), reader))
